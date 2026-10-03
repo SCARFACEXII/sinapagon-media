@@ -4,7 +4,7 @@ from engine import *
 U = "/root/.claude/uploads/496944e7-2387-59a5-b6d7-4284eb12520e/"
 CL = {k: U + v for k, v in {"404": "0731b340-VID-20261001-WA0404.mp4", "403": "65a8fd6a-VID-20261001-WA0403.mp4",
       "399": "b45c053a-VID-20261001-WA0399.mp4", "405": "4debce8f-VID-20261001-WA0405.mp4", "402": "3632993f-VID-20261001-WA0402.mp4",
-      "406": "45d642d2-VID-20261001-WA0406.mp4", "407": "8f9207e7-VID-20261001-WA0407.mp4"}.items()}
+      "406": "45d642d2-VID-20261001-WA0406.mp4", "407": "8f9207e7-VID-20261001-WA0407.mp4", "398": "7e3da322-VID-20261001-WA0398.mp4"}.items()}
 def foot(key, start, zoom=(1.0, 1.12), focus=(0.5, 0.5), dim=70):
     st = {}
     def get(u, dur):
@@ -37,3 +37,17 @@ def build(key, spoken, show, fns, out):
     n = len(fns)
     scenes = [(0 if i == 0 else T[i][0], T[i + 1][0] if i < n - 1 else TOTAL, fn) for i, fn in enumerate(fns)]
     render(out, TOTAL, scenes, track)
+
+def pot(d, cx, cy, s):
+    d.rounded_rectangle([cx - s, cy - s * 0.3, cx + s, cy + s * 0.75], radius=int(s * 0.25), fill=(200, 205, 215), outline=WHT, width=4)
+    d.rectangle([cx - s * 1.2, cy - s * 0.25, cx - s, cy - s * 0.05], fill=(150, 155, 165)); d.rectangle([cx + s, cy - s * 0.25, cx + s * 1.2, cy - s * 0.05], fill=(150, 155, 165))
+    d.rounded_rectangle([cx - s * 1.05, cy - s * 0.5, cx + s * 1.05, cy - s * 0.3], radius=8, fill=(120, 125, 135)); d.ellipse([cx - 14, cy - s * 0.68, cx + 14, cy - s * 0.48], fill=(120, 125, 135))
+def microwave(d, cx, cy, s):
+    d.rounded_rectangle([cx - s * 1.3, cy - s * 0.75, cx + s * 1.3, cy + s * 0.75], radius=18, fill=(220, 225, 235), outline=WHT, width=4)
+    d.rounded_rectangle([cx - s * 1.1, cy - s * 0.55, cx + s * 0.5, cy + s * 0.55], radius=12, fill=(30, 40, 60))
+    for k in range(3): d.ellipse([cx + s * 0.75, cy - s * 0.45 + k * s * 0.35, cx + s * 0.95, cy - s * 0.25 + k * s * 0.35], fill=(90, 95, 110))
+def shower(d, cx, cy, s, t):
+    d.rounded_rectangle([cx - s * 0.7, cy - s * 0.9, cx + s * 0.7, cy - s * 0.5], radius=16, fill=(220, 225, 235), outline=WHT, width=4)
+    for k in range(7):
+        x = cx - s * 0.55 + k * s * 0.18; y = cy - s * 0.35 + ((t * 300 + k * 37) % (s * 1.2))
+        d.line([(x, y), (x, y + 26)], fill=CYAN, width=6)
