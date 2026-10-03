@@ -59,6 +59,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:6px solid var(--yel);box-shadow:0 4px 14px rgba(0,0,0,.35)}
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:6px solid var(--yel)}
 .ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:8px}
+.pan-sel{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line)}
 .ac-extra{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);display:none}
 .ac-extra.show{display:block}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -130,6 +131,11 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <div class="slider-top"><div class="lbl">Horas de apagón</div><div class="big" id="hv">12<small>h</small></div></div>
       <input type="range" id="hours" min="2" max="24" step="1" value="12">
       <div class="ticks"><span>2 h</span><span>12 h</span><span>24 h</span></div>
+      <div class="pan-sel">
+        <div class="lbl">¿Qué paneles quieres usar?</div>
+        <div class="hint">Elige la potencia de cada panel</div>
+        <div class="chips" id="panChips"></div>
+      </div>
       <div class="ac-extra" id="acx">
         <div class="lbl">¿Cuántas horas usas el aire por la noche?</div>
         <div class="hint">El aire es lo que más gasta de la batería</div>
@@ -145,7 +151,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <h3 id="kName">Kit 5 kW</h3>
       <p id="kDesc"></p>
       <div class="specs">
-        <div class="spec"><div class="v" id="sPan">4</div><div class="k">paneles 550 W</div></div>
+        <div class="spec"><div class="v" id="sPan">4</div><div class="k" id="sPanK">paneles 550 W</div></div>
         <div class="spec"><div class="v" id="sInv">5 kW</div><div class="k">inversor</div></div>
         <div class="spec"><div class="v" id="sBat">10 kWh</div><div class="k">batería litio</div></div>
       </div>
@@ -162,7 +168,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <button class="btn again" onclick="window.scrollTo({top:0,behavior:'smooth'})">Cambiar mis equipos</button>
   </section>
 
-  <p class="foot">Cálculo orientativo con valores típicos (panel de 550 W ≈ 2,1 kWh/día).<br>¿Dudas con tu cálculo? Escríbenos y lo revisamos contigo.<br>© Sin Apagón · UNETECH STORE</p>
+  <p class="foot">Cálculo orientativo con valores típicos (cada 550 W de panel ≈ 2,1 kWh/día).<br>¿Dudas con tu cálculo? Escríbenos y lo revisamos contigo.<br>© Sin Apagón · UNETECH STORE</p>
 </div>
 
 <div class="bar"><div class="in">
@@ -216,7 +222,7 @@ const E = [
   {id:"cal",n:"Calentador / ducha eléctrica",w:3500,h:.5,c:"day",i:"heater"},
   {id:"bomba",n:"Bomba de agua ½ HP",w:400,h:1,c:"day",i:"pump"}
 ];
-const Q = {}; let acH = 6;
+const Q = {}; let acH = 6, PW = 550; const PANS=[400,450,550,600,650];
 const $ = s => document.querySelector(s);
 const fmt = (x,d=1) => x.toLocaleString("es",{maximumFractionDigits:d,minimumFractionDigits:0});
 function svg(k){return `<svg viewBox="0 0 24 24">${I[k]}</svg>`}
@@ -230,9 +236,11 @@ function build(){
       <div class="stepper"><button aria-label="menos" onclick="chg('${e.id}',-1)">−</button><span class="q" id="q-${e.id}">0</span><button class="plus" aria-label="más" onclick="chg('${e.id}',1)">+</button></div></div>`;
   });
   html += "</div>"; $("#equip").innerHTML = html;
+  $("#panChips").innerHTML = PANS.map(w=>`<button class="chip${w===PW?' on':''}" onclick="setPan(${w})">${w} W</button>`).join("");
   $("#acChips").innerHTML = [2,4,6,8,10,12].map(h=>`<button class="chip${h===acH?' on':''}" onclick="setAc(${h})">${h} h</button>`).join("");
 }
 function chg(id,d){ Q[id] = Math.max(0, Math.min(40, Q[id]+d)); $("#q-"+id).textContent = Q[id]; $("#it-"+id).classList.toggle("on", Q[id]>0); upd(); }
+function setPan(w){ PW = w; document.querySelectorAll("#panChips .chip").forEach(c=>c.classList.toggle("on", c.textContent==w+" W")); upd(); }
 function setAc(h){ acH = h; document.querySelectorAll("#acChips .chip").forEach(c=>c.classList.toggle("on", c.textContent==h+" h")); upd(); }
 const hr = $("#hours");
 hr.addEventListener("input", ()=>{ upd(); });
@@ -246,7 +254,7 @@ function calc(){
   });
   const kwh = cont+ac+day;
   const batt = (cont*H/24 + acOut)/0.9*1.1;
-  const pan = Math.max(2, Math.ceil(kwh*1.15/2.1));
+  const pan = Math.max(2, Math.ceil(kwh*1.15/(2.1*PW/550)));
   const peak = pCont + pAc + pDay;
   const inv = peak*1.2/1000;
   return {H,kwh,batt,pan,peak,inv,n,heavy,hasAc:pAc>0,day};
@@ -263,11 +271,11 @@ function upd(){
 }
 function render(r){
   let name, tag="Recomendado para ti", desc, pan, inv, bat, extra=0;
-  if(r.inv<=5 && r.batt<=10.5 && r.pan<=6){
-    name="Kit 5 kW"; pan=4; inv=5; bat=10; extra=Math.max(0,r.pan-4);
+  if(r.inv<=5 && r.batt<=10.5 && r.pan<=Math.ceil(3300/PW)){
+    name="Kit 5 kW"; pan=Math.ceil(2200/PW); inv=5; bat=10; extra=Math.max(0,r.pan-pan);
     desc="El kit más pedido. Mueve tu casa durante el apagón sin preocuparte.";
-  } else if(r.inv<=10 && r.batt<=15.5 && r.pan<=14){
-    name="Kit 10 kW"; pan=12; inv=10; bat=15; extra=Math.max(0,r.pan-12);
+  } else if(r.inv<=10 && r.batt<=15.5 && r.pan<=Math.ceil(7700/PW)){
+    name="Kit 10 kW"; pan=Math.ceil(6600/PW); inv=10; bat=15; extra=Math.max(0,r.pan-pan);
     desc="Para casas con aire acondicionado y muchos equipos. Aguanta la casa completa.";
   } else {
     name="Sistema a medida"; tag="Tu casa necesita más"; pan=r.pan; inv=Math.ceil(r.inv); bat=Math.ceil(r.batt/5)*5;
@@ -275,7 +283,7 @@ function render(r){
   }
   if(extra) desc += ` Te recomendamos agregar ${extra} panel${extra>1?"es":""} extra.`;
   $("#kTag").textContent=tag; $("#kName").textContent=name; $("#kDesc").textContent=desc;
-  $("#sPan").textContent=pan+extra; $("#sInv").textContent=inv+" kW"; $("#sBat").textContent=bat+" kWh";
+  $("#sPan").textContent=pan+extra; $("#sPanK").textContent=`paneles ${PW} W`; $("#sInv").textContent=inv+" kW"; $("#sBat").textContent=bat+" kWh";
   $("#mE").textContent=fmt(r.kwh)+" kWh"; $("#mB").textContent=fmt(r.batt)+" kWh"; $("#mP").textContent=fmt(r.peak,0)+" W";
   setTimeout(()=>{ $("#fE").style.width=Math.min(100,r.kwh/25*100)+"%"; $("#fB").style.width=Math.min(100,r.batt/(bat||1)*100)+"%"; $("#fP").style.width=Math.min(100,r.peak/1000/(inv||1)*100)+"%"; },60);
   const t=[];
@@ -285,7 +293,7 @@ function render(r){
   if(r.pan<=pan+extra) t.push(["✅",`Los paneles cubren tu consumo de ${fmt(r.kwh)} kWh al día y cargan la batería.`]);
   $("#tips").innerHTML=t.map(x=>`<div class="tip"><i>${x[0]}</i><span>${x[1]}</span></div>`).join("");
   const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n}`).join("\n");
-  const msg=`Hola Sin Apagón 👋 Usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
+  const msg=`Hola Sin Apagón 👋 Usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 $("#go").addEventListener("click", ()=>{ const r=calc(); $("#res").classList.add("show"); render(r); setTimeout(()=>$("#res").scrollIntoView({behavior:"smooth"}),50); });
