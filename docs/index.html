@@ -296,8 +296,12 @@ function render(r){
   const msg=`Hola Sin Apagón 👋 Usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
-$("#go").addEventListener("click", ()=>{ const r=calc(); $("#res").classList.add("show"); render(r); setTimeout(()=>$("#res").scrollIntoView({behavior:"smooth"}),50); });
+function track(path,title){ try{ if(window.goatcounter && goatcounter.count) goatcounter.count({path, title, event:true}); }catch(e){} }
+$("#go").addEventListener("click", ()=>{ const r=calc(); $("#res").classList.add("show"); render(r); setTimeout(()=>$("#res").scrollIntoView({behavior:"smooth"}),50);
+  const k=$("#kName").textContent; track("calculo-"+k.toLowerCase().replace(/\s+/g,"-"), "Calculó: "+k+" · "+r.H+" h apagón · panel "+PW+" W"); });
+$("#wa").addEventListener("click", ()=>track("whatsapp-dudas","Tocó WhatsApp: "+$("#kName").textContent));
 build(); upd();
 </script>
+<script data-goatcounter="https://sinapagon.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
