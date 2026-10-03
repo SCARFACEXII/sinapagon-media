@@ -158,11 +158,11 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="tips" id="tips"></div>
     <div style="margin-top:16px"><a class="btn btn-w" id="wa" target="_blank" rel="noopener">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="#05301a"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.7-.3-1.4-.7-2-1.2-.5-.5-1-1.1-1.3-1.7-.1-.2 0-.4.1-.5l.4-.5.2-.4v-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.6.6-.9 1.3-.9 2.1.1.9.4 1.8 1 2.5 1.1 1.6 2.4 2.9 4.1 3.7.5.2 1 .4 1.4.5.5.2 1 .1 1.5.1.6-.1 1.1-.5 1.4-1 .2-.4.2-.8.1-1.1l-.4-.3z"/></svg>
-      Pedir este kit por WhatsApp</a></div>
+      ¿Tienes dudas? Escríbenos</a></div>
     <button class="btn again" onclick="window.scrollTo({top:0,behavior:'smooth'})">Cambiar mis equipos</button>
   </section>
 
-  <p class="foot">Cálculo orientativo con valores típicos (panel de 550 W ≈ 2,1 kWh/día).<br>Para un presupuesto exacto, escríbenos y lo revisamos contigo.<br>© Sin Apagón · UNETECH STORE</p>
+  <p class="foot">Cálculo orientativo con valores típicos (panel de 550 W ≈ 2,1 kWh/día).<br>¿Dudas con tu cálculo? Escríbenos y lo revisamos contigo.<br>© Sin Apagón · UNETECH STORE</p>
 </div>
 
 <div class="bar"><div class="in">
@@ -285,7 +285,7 @@ function render(r){
   if(r.pan<=pan+extra) t.push(["✅",`Los paneles cubren tu consumo de ${fmt(r.kwh)} kWh al día y cargan la batería.`]);
   $("#tips").innerHTML=t.map(x=>`<div class="tip"><i>${x[0]}</i><span>${x[1]}</span></div>`).join("");
   const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n}`).join("\n");
-  const msg=`Hola Sin Apagón 👋 Usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\n👉 Resultado: ${name} (${pan+extra} paneles, inversor ${inv} kW, batería ${bat} kWh)\n\nQuiero más información.`;
+  const msg=`Hola Sin Apagón 👋 Usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 $("#go").addEventListener("click", ()=>{ const r=calc(); $("#res").classList.add("show"); render(r); setTimeout(()=>$("#res").scrollIntoView({behavior:"smooth"}),50); });
