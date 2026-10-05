@@ -2,8 +2,8 @@
 
 | Fecha | Formato | Tema | Base (local) | Final (con b-roll + música) | Metricool uuid |
 |---|---|---|---|---|---|
-| Mié 7 oct 16:00 | Mito o realidad | ¿Los paneles no funcionan nublado? | mito_nublado_base.mp4 | https://static.metricool.com/planner/202610/7112287-file-13871623916912261164.mp4 | -8414243087638115946 (borrador) |
-| Sáb 10 oct 16:00 | ¿Cuál gasta más? | Ventilador vs olla, bomba vs nevera, celular 1 año vs ducha | cual_gasta_mas_base.mp4 | https://static.metricool.com/planner/202610/7112287-file-335542645330718182.mp4 | -4306882414010348708 (borrador) |
+| Mié 7 oct 16:00 | Mito o realidad | ¿Los paneles no funcionan nublado? | mito_nublado_base.mp4 | https://static.metricool.com/planner/202610/7112287-file-13871623916912261164.mp4 | -8414243087638115946 (activo) |
+| Sáb 10 oct 16:00 | ¿Cuál gasta más? | Ventilador vs olla, bomba vs nevera, celular 1 año vs ducha | cual_gasta_mas_base.mp4 | https://static.metricool.com/planner/202610/7112287-file-335542645330718182.mp4 | -4306882414010348708 (activo) |
 
 ## Movidos
 - "Litio vs plomo" → 20 oct (borrador)
