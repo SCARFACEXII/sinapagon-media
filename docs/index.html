@@ -293,7 +293,7 @@ function render(r){
   if(r.pan<=pan+extra) t.push(["✅",`Los paneles cubren tu consumo de ${fmt(r.kwh)} kWh al día y cargan la batería.`]);
   $("#tips").innerHTML=t.map(x=>`<div class="tip"><i>${x[0]}</i><span>${x[1]}</span></div>`).join("");
   const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n}`).join("\n");
-  const msg=`Hola Sin Apagón 👋 Usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
+  const msg=`Hola Sin Apagón, usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 function track(path,title){ try{ if(window.goatcounter && goatcounter.count) goatcounter.count({path, title, event:true}); }catch(e){} }
