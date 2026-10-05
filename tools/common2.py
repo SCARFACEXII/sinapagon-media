@@ -51,3 +51,15 @@ def shower(d, cx, cy, s, t):
     for k in range(7):
         x = cx - s * 0.55 + k * s * 0.18; y = cy - s * 0.35 + ((t * 300 + k * 37) % (s * 1.2))
         d.line([(x, y), (x, y + 26)], fill=CYAN, width=6)
+
+def station(d, cx, cy, s):
+    d.rounded_rectangle([cx - s, cy - s * 0.65, cx + s, cy + s * 0.75], radius=int(s * 0.18), fill=(40, 42, 48), outline=(255, 160, 40), width=8)
+    d.rounded_rectangle([cx - s * 0.6, cy - s * 0.95, cx + s * 0.6, cy - s * 0.65], radius=16, outline=(255, 160, 40), width=10)
+    d.rounded_rectangle([cx - s * 0.7, cy - s * 0.4, cx - s * 0.05, cy + s * 0.05], radius=10, fill=(30, 60, 90))
+    for k in range(3): d.rounded_rectangle([cx - s * 0.7 + k * s * 0.48, cy + s * 0.25, cx - s * 0.4 + k * s * 0.48, cy + s * 0.55], radius=6, fill=(20, 20, 24))
+    d.ellipse([cx + s * 0.25, cy - s * 0.35, cx + s * 0.55, cy - s * 0.05], outline=(255, 160, 40), width=6)
+def checks(fr, u, items, y0, at0, step):
+    for i, (txt, ok) in enumerate(items):
+        L = new_layer(); d = ImageDraw.Draw(L); y = y0 + i * 118
+        pill(d, W / 2, y, ("✓  " + txt) if ok else ("NO · " + txt), 58, NAVY if ok else WHT, GRN if ok else RED)
+        layer_pop(fr, L, u, W / 2, y + 30, at0 + i * step, 0.25)
