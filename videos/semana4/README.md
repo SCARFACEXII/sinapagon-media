@@ -1,18 +1,17 @@
-# Semana 4 — plantilla visual v2
+# Semana 4 — un formato distinto cada día
 
-| Fecha | Formato | Tema | Base (local) | Final (con b-roll + música) | Metricool uuid |
-|---|---|---|---|---|---|
-| Mié 7 oct 16:00 | Mito o realidad | ¿Los paneles no funcionan nublado? | mito_nublado_base.mp4 | https://static.metricool.com/planner/202610/7112287-file-13871623916912261164.mp4 | -8414243087638115946 (activo) |
-| Sáb 10 oct 16:00 | ¿Cuál gasta más? | Ventilador vs olla, bomba vs nevera, celular 1 año vs ducha | cual_gasta_mas_base.mp4 | https://static.metricool.com/planner/202610/7112287-file-335542645330718182.mp4 | -4306882414010348708 (activo) |
+| Fecha 16:00 | Formato | Tema | Base | Estado |
+|---|---|---|---|---|
+| Mar 6 | ALERTA (sirena roja) | Volvió la corriente y se quemó la nevera → protector de voltaje | alerta_corriente_base.mp4 | activo |
+| Mié 7 | MITO O REALIDAD | ¿Paneles no funcionan nublado? | mito_nublado_base.mp4 | activo |
+| Jue 8 | BATALLA (ring de boxeo, marcador) | Gel vs litio, 4 rounds | batalla_gel_litio_base.mp4 | activo |
+| Vie 9 | PASO A PASO (plano azul) | Aire acondicionado con paneles en 3 pasos | aire_3pasos_base.mp4 | activo |
+| Sáb 10 | ¿CUÁL GASTA MÁS? (juego) | Ventilador/olla, bomba/nevera, celular/ducha | cual_gasta_mas_base.mp4 | activo |
+| Dom 11 | CRONÓMETRO NOCTURNO | Apagón 8 pm: ¿hasta qué hora dura tu batería? | noche_bateria_base.mp4 | activo |
+| Lun 12 | ZONA DE OBRA (cinta amarilla) | 3 errores de instalación que salen caros | errores_instalacion_base.mp4 | activo |
 
-## Movidos
-- "Litio vs plomo" → 20 oct (borrador)
-- "Qué agregar primero" → 21 oct (borrador; repetía el tema del 3 oct)
+Reservados (borrador): litio vs plomo (20 oct), qué agregar primero (21 oct).
+Retirado: "5 equipos que se comen tu batería" (repetía el juego del sábado 10).
 
-## Qué cambió en la plantilla v2 (tools/engine2.py)
-- Fondos nuevos por formato (rojo/verde diagonal para mitos, morado con confeti para quiz)
-- Transición zoom-punch en vez del flash blanco
-- Subtítulos en caja oscura con barra amarilla
-- Sellos rotados ("MITO", "¡GANA!", "COMENTA")
-- Huecos con b-roll de Pexels insertado por vidIQ compose (créditos en broll/catalogo.json)
-- Pista musical nueva (electrónica 112 bpm)
+Código: tools/engine2.py (mito, quiz) y tools/engine3.py (alerta, batalla, plano, noche, obra).
+B-roll con créditos: broll/catalogo.json. Música: pista electrónica 112 bpm.
