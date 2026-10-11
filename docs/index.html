@@ -274,11 +274,11 @@ hr.addEventListener("input", ()=>{ upd(); });
 const INV_STD=[1,2,3,5,6,8,10,12,15,20,25,30];
 function invStd(kw){ return INV_STD.find(v=>v>=kw-0.05) || Math.ceil(kw); }
 function calc(){
-  const H = +hr.value; let cont=0, ac=0, acOut=0, day=0, pCont=0, pAc=0, pDay=0, n=0, heavy=[], surge=0, surgeND=0, acTxt=[];
+  const H = +hr.value; let cont=0, ac=0, acOut=0, day=0, pCont=0, pAc=0, pDay=0, n=0, heavy=[], surge=0, surgeND=0, acTxt=[], nAc=0;
   E.forEach(e=>{ if(!e.id || !Q[e.id]) return; const q=Q[e.id], h=HR[e.id]; n+=q;
     const ex = (e.m||0)*e.w;  // pico extra al arrancar (motores/compresores)
     if(e.c==="cont"){ cont += e.w*h*(e.d||1)*q/1000; pCont += e.w*q; surge=Math.max(surge,ex); surgeND=Math.max(surgeND,ex); }
-    else if(e.c==="ac"){ ac += e.w*h*q/1000; acOut += e.w*Math.min(h,H)*q/1000; pAc += e.w*q; surge=Math.max(surge,ex); surgeND=Math.max(surgeND,ex); acTxt.push(`${q} aire${q>1?"s":""} ${hfmt(h)}`); }
+    else if(e.c==="ac"){ ac += e.w*h*q/1000; acOut += e.w*Math.min(h,H)*q/1000; pAc += e.w*q; nAc += q; surge=Math.max(surge,ex); surgeND=Math.max(surgeND,ex); acTxt.push(`${q} aire${q>1?"s":""} ${hfmt(h)}`); }
     else { day += e.w*h*q/1000; pDay = Math.max(pDay, e.w); surge=Math.max(surge,ex); if(e.w>=900) heavy.push(e.n.split(" /")[0].toLowerCase()); }
   });
   const kwh = cont+ac+day;
@@ -288,7 +288,19 @@ function calc(){
   const peak = pCont + pAc + pDay;
   const inv = Math.max(peak*1.25, peak + surge)/1000;                       // potencia continua +25% o pico de arranque
   const invNoDay = Math.max((peak-pDay)*1.25, (peak-pDay) + surgeND)/1000;
-  return {H,kwh,batt,pan,peak,inv,invNoDay,n,heavy,hasAc:pAc>0,day,pDay,acTxt};
+  // Inversor del sistema (no solo por carga):
+  //  1) carga a la vez + arranque, repartida en 2 líneas de 110 V (fase dividida): la línea más cargada lleva ~60% + el arranque mayor
+  //  2) los paneles: potencia FV ≤ 1,3 × inversor
+  //  3) la batería: poder recargarla en ~4,5 h de sol
+  //  4) casas grandes (2+ aires o >15 kWh/día): mínimo 10 kW
+  const legNeed = 2*(peak*0.6 + surge)/1000;
+  const pvKW = pan*PW/1000;
+  let sysInv = Math.max(inv, legNeed*0.85, pvKW/1.3, batt/4.5);
+  const big = nAc>=2 || kwh>15;
+  if(big) sysInv = Math.max(sysInv, 10);
+  const SYS=[5,10,12,15,20,25,30];
+  const invSys = SYS.find(v=>v>=sysInv-0.05) || Math.ceil(sysInv/5)*5;
+  return {H,kwh,batt,pan,peak,inv,invNoDay,n,heavy,hasAc:pAc>0,day,pDay,acTxt,invSys,pvKW,big,nAc};
 }
 function upd(){
   const H = +hr.value; $("#hv").innerHTML = H+"<small>h</small>";
@@ -327,14 +339,14 @@ function renderEx(r){
 function render(r){
   if(EX) return renderEx(r);
   let name, tag="Recomendado para ti", desc, pan, inv, bat, extra=0;
-  if(r.inv<=5 && r.batt<=10.5 && r.pan<=Math.ceil(3300/PW)){
+  if(r.invSys<=5 && r.batt<=10.5 && r.pan<=Math.ceil(3300/PW)){
     name="Kit 5 kW"; pan=Math.ceil(2200/PW); inv=5; bat=10; extra=Math.max(0,r.pan-pan);
     desc="El kit más pedido. Mueve tu casa durante el apagón sin preocuparte.";
-  } else if(r.inv<=10 && r.batt<=15.5 && r.pan<=Math.ceil(7700/PW)){
+  } else if(r.invSys<=10 && r.batt<=15.5 && r.pan<=Math.ceil(7700/PW)){
     name="Kit 10 kW"; pan=Math.ceil(6600/PW); inv=10; bat=15; extra=Math.max(0,r.pan-pan);
     desc="Para casas con aire acondicionado y muchos equipos. Aguanta la casa completa.";
   } else {
-    name="Sistema a medida"; tag="Tu casa necesita más"; pan=r.pan; inv=Math.max(5,invStd(r.inv)); bat=Math.ceil(r.batt/5)*5;
+    name="Sistema a medida"; tag="Tu casa necesita más"; pan=r.pan; inv=r.invSys; bat=Math.ceil(r.batt/5)*5;
     desc="Tu consumo es grande. Lo diseñamos a tu medida: escríbenos y lo revisamos juntos.";
   }
   if(extra) desc += ` Te recomendamos agregar ${extra} panel${extra>1?"es":""} extra.`;
@@ -346,7 +358,8 @@ function render(r){
   if(r.heavy.length) t.push(["☀️",`Usa ${[...new Set(r.heavy)].join(", ")} de día, con el sol. Así no gastas la batería.`]);
   if(r.hasAc) t.push(["❄️",`El aire es lo que más consume: lo calculamos con ${r.acTxt.join(" y ")} por noche.`]);
   if(r.batt<5 && bat>=10) t.push(["💡",`Tu consumo en el apagón es bajo (≈ ${fmt(r.batt)} kWh): con una batería más pequeña también te alcanzaría. Escríbenos y lo ajustamos.`]);
-  t.push(["⚡",`El inversor está calculado para aguantar tus equipos a la vez (${fmt(r.peak,0)} W) más el arranque de nevera, aire o bomba.`]);
+  t.push(["⚡",`Inversor de ${inv} kW: aguanta tus equipos a la vez (${fmt(r.peak,0)} W) más el arranque de nevera, aire o bomba, ${pan+extra>4?`recibe tus ${pan+extra} paneles`:"recibe tus paneles"} y recarga la batería con el sol.`]);
+  if(inv>=10) t.push(["🔌",`Es de fase dividida: ${inv/2} kW por cada línea de 110 V. Reparte los aires y los equipos grandes entre las dos líneas.`]);
   t.push(["🔋",`Con ${r.H} h de apagón necesitas unos ${fmt(r.batt)} kWh de batería de litio.`]);
   if(r.pan<=pan+extra) t.push(["✅",`Los paneles cubren tu consumo de ${fmt(r.kwh)} kWh al día y cargan la batería.`]);
   $("#tips").innerHTML=t.map(x=>`<div class="tip"><i>${x[0]}</i><span>${x[1]}</span></div>`).join("");
