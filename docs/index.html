@@ -38,8 +38,8 @@ section{margin-top:30px}
 .sec-h h2{font-size:21px;font-weight:800}
 .sec-h p{font-size:13px;color:var(--mut)}
 .group{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--cyan);font-weight:800;margin:18px 2px 10px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-@media(min-width:560px){.grid{grid-template-columns:repeat(3,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .item{position:relative;background:linear-gradient(180deg,var(--card),var(--bg2));border:1.5px solid var(--line);border-radius:var(--r);padding:14px 12px 12px;transition:.18s;user-select:none}
 .item.on{border-color:var(--yel);box-shadow:0 0 0 3px rgba(255,196,0,.15),0 10px 30px rgba(0,0,0,.25);background:linear-gradient(180deg,#173c8c,#0d2a69)}
 .ic{width:44px;height:44px;border-radius:14px;background:rgba(63,210,255,.10);display:grid;place-items:center;color:var(--cyan);margin-bottom:10px}
@@ -52,6 +52,11 @@ section{margin-top:30px}
 .stepper button:active{transform:scale(.92)}
 .item.on .stepper .plus{background:var(--yel);color:#06163a}
 .stepper .q{font-weight:800;font-size:18px;min-width:24px;text-align:center}
+.hrs{display:none;align-items:center;justify-content:space-between;gap:2px;margin-top:8px;background:rgba(63,210,255,.08);border:1px solid rgba(63,210,255,.25);border-radius:12px;padding:6px 6px 6px 8px;font-size:12px;color:var(--mut)}
+.item.on .hrs{display:flex;flex-wrap:wrap}
+.hrs button{width:30px;height:30px;border:0;border-radius:9px;background:rgba(255,255,255,.08);color:var(--txt);font-size:18px;font-weight:700;cursor:pointer}
+.hrs b{color:var(--cyan);font-size:15px;min-width:40px;text-align:center;white-space:nowrap}
+.hrs span{flex-basis:100%;padding:2px 0 4px 2px}
 .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:18px}
 .slider-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
 .big{font-size:52px;font-weight:900;line-height:1;color:var(--yel)}.big small{font-size:18px;color:var(--mut);font-weight:700;margin-left:4px}
@@ -122,14 +127,14 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <h1>¿Qué sistema solar <em>necesitas</em>?</h1>
     <p class="lead">Marca los equipos de tu casa y cuántas horas te quitan la corriente. En 1 minuto te decimos qué kit te sirve.</p>
     <div class="steps">
-      <div><b>1. Tus equipos</b>Marca lo que quieres mantener encendido</div>
+      <div><b>1. Tus equipos</b>Marca lo que usas y cuántas horas</div>
       <div><b>2. Tu apagón</b>Cuántas horas al día</div>
       <div><b>3. Tu kit</b>Paneles, inversor y batería</div>
     </div>
   </div>
 
   <section>
-    <div class="sec-h"><div class="num">1</div><div><h2>Tus equipos</h2><p>Toca + para agregar la cantidad</p></div></div>
+    <div class="sec-h"><div class="num">1</div><div><h2>Tus equipos</h2><p>Toca + y ajusta las horas de uso de cada equipo</p></div></div>
     <div id="equip"></div>
   </section>
 
@@ -155,11 +160,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <div class="ex-row"><span>Batería: amperes (Ah)</span><input id="exAh" type="number" inputmode="numeric" min="0" max="2000" step="10" value="100"></div>
           <div class="hint">La potencia de tus paneles es la que marcaste arriba. Si tienes varias baterías, pon el total de Ah.</div>
         </div>
-      </div>
-      <div class="ac-extra" id="acx">
-        <div class="lbl">¿Cuántas horas usas el aire por la noche?</div>
-        <div class="hint">El aire es lo que más gasta de la batería</div>
-        <div class="chips" id="acChips"></div>
       </div>
     </div>
   </section>
@@ -221,12 +221,12 @@ const I = {
 // cat: cont = encendido gran parte del día · ac = aire (noche) · day = equipos grandes (usar con sol)
 const E = [
   {g:"Refrigeración"},
-  {id:"nevera",n:"Nevera / refrigerador",w:150,h:8,c:"cont",i:"fridge"},
-  {id:"freezer",n:"Freezer",w:180,h:8,c:"cont",i:"freezer"},
-  {id:"minibar",n:"Minibar",w:70,h:8,c:"cont",i:"mini"},
+  {id:"nevera",n:"Nevera / refrigerador",w:150,h:24,d:.35,c:"cont",m:2,i:"fridge"},
+  {id:"freezer",n:"Freezer",w:180,h:24,d:.35,c:"cont",m:2,i:"freezer"},
+  {id:"minibar",n:"Minibar",w:70,h:24,d:.35,c:"cont",m:2,i:"mini"},
   {g:"Climatización"},
-  {id:"aire12",n:"Aire 12.000 BTU (1 ton)",w:900,c:"ac",i:"ac"},
-  {id:"aire18",n:"Aire 18.000 BTU",w:1400,c:"ac",i:"ac"},
+  {id:"aire12",n:"Aire 12.000 BTU (1 ton)",w:900,h:6,c:"ac",m:1,i:"ac"},
+  {id:"aire18",n:"Aire 18.000 BTU",w:1400,h:6,c:"ac",m:1,i:"ac"},
   {id:"vent",n:"Ventilador",w:60,h:10,c:"cont",i:"fan"},
   {g:"Casa"},
   {id:"led",n:"Bombillo LED",w:10,h:6,c:"cont",i:"bulb"},
@@ -235,14 +235,14 @@ const E = [
   {id:"cel",n:"Cargador de celular",w:10,h:4,c:"cont",i:"phone"},
   {id:"pc",n:"Computadora / laptop",w:120,h:5,c:"cont",i:"laptop"},
   {g:"Cocina y equipos grandes"},
-  {id:"lav",n:"Lavadora",w:500,h:1,c:"day",i:"washer"},
+  {id:"lav",n:"Lavadora",w:500,h:1,c:"day",m:1,i:"washer"},
   {id:"olla",n:"Olla reina / arrocera",w:900,h:1,c:"day",i:"pot"},
   {id:"horn",n:"Hornilla / fogón eléctrico",w:1500,h:1.5,c:"day",i:"stove"},
   {id:"micro",n:"Microondas",w:1200,h:.3,c:"day",i:"micro"},
   {id:"cal",n:"Calentador / ducha eléctrica",w:3500,h:.5,c:"day",i:"heater"},
-  {id:"bomba",n:"Bomba de agua ½ HP",w:400,h:1,c:"day",i:"pump"}
+  {id:"bomba",n:"Bomba de agua ½ HP",w:400,h:1,c:"day",m:2,i:"pump"}
 ];
-const Q = {}; let acH = 6, PW = 550, EX = false; const PANS=[400,450,550,600,650];
+const Q = {}, HR = {}; const HSTEP=[0.5,1,1.5,2,3,4,5,6,7,8,9,10,11,12,14,16,18,20,22,24]; let PW = 550, EX = false; const PANS=[400,450,550,600,650];
 const $ = s => document.querySelector(s);
 const fmt = (x,d=1) => x.toLocaleString("es",{maximumFractionDigits:d,minimumFractionDigits:0});
 function svg(k){return `<svg viewBox="0 0 24 24">${I[k]}</svg>`}
@@ -251,14 +251,16 @@ function build(){
   let html = "", open = false;
   E.forEach(e=>{
     if(e.g){ if(open) html += "</div>"; html += `<div class="group">${e.g}</div><div class="grid">`; open = true; return; }
-    Q[e.id] = 0;
+    Q[e.id] = 0; HR[e.id] = e.h;
     html += `<div class="item" id="it-${e.id}"><div class="ic">${svg(e.i)}</div><div class="name">${e.n}</div><div class="watt">≈ ${fmt(e.w,0)} W</div>
-      <div class="stepper"><button aria-label="menos" onclick="chg('${e.id}',-1)">−</button><span class="q" id="q-${e.id}">0</span><button class="plus" aria-label="más" onclick="chg('${e.id}',1)">+</button></div></div>`;
+      <div class="stepper"><button aria-label="menos" onclick="chg('${e.id}',-1)">−</button><span class="q" id="q-${e.id}">0</span><button class="plus" aria-label="más" onclick="chg('${e.id}',1)">+</button></div>
+      <div class="hrs"><span>⏱ ${e.c==="ac"?"Horas por la noche":(e.d?"Horas enchufada":"Horas de uso al día")}</span><button aria-label="menos horas" onclick="chgH('${e.id}',-1)">−</button><b id="h-${e.id}">${hfmt(e.h)}</b><button aria-label="más horas" onclick="chgH('${e.id}',1)">+</button></div></div>`;
   });
   html += "</div>"; $("#equip").innerHTML = html;
   $("#panChips").innerHTML = PANS.map(w=>`<button class="chip${w===PW?' on':''}" onclick="setPan(${w})">${w} W</button>`).join("");
-  $("#acChips").innerHTML = [2,4,6,8,10,12].map(h=>`<button class="chip${h===acH?' on':''}" onclick="setAc(${h})">${h} h</button>`).join("");
 }
+function hfmt(h){ return (h<1? (h*60)+" min" : fmt(h)+" h"); }
+function chgH(id,d){ let i=HSTEP.findIndex(v=>v>=HR[id]); if(i<0) i=HSTEP.length-1; if(HSTEP[i]!==HR[id] && d<0) i++; i=Math.max(0,Math.min(HSTEP.length-1,i+d)); HR[id]=HSTEP[i]; $("#h-"+id).textContent=hfmt(HR[id]); upd(); }
 function chg(id,d){ Q[id] = Math.max(0, Math.min(40, Q[id]+d)); $("#q-"+id).textContent = Q[id]; $("#it-"+id).classList.toggle("on", Q[id]>0); upd(); }
 function setPan(w){ PW = w; document.querySelectorAll("#panChips .chip").forEach(c=>c.classList.toggle("on", c.textContent==w+" W")); upd(); }
 function setEx(v){ EX = v; $("#exNo").classList.toggle("on",!v); $("#exYes").classList.toggle("on",v); $("#exF").classList.toggle("show",v);
@@ -266,36 +268,39 @@ function setEx(v){ EX = v; $("#exNo").classList.toggle("on",!v); $("#exYes").cla
   $("#go").textContent = v ? "Revisar mi sistema →" : "Ver mi kit →"; upd(); }
 ["#exInv","#exNp","#exV","#exAh"].forEach(id=>document.querySelector(id).addEventListener("input",()=>upd()));
 function exVals(){ const n=x=>Math.max(0,parseFloat(String($(x).value).replace(",","."))||0); return {inv:n("#exInv"),np:Math.round(n("#exNp")),v:n("#exV"),ah:n("#exAh")}; }
-function setAc(h){ acH = h; document.querySelectorAll("#acChips .chip").forEach(c=>c.classList.toggle("on", c.textContent==h+" h")); upd(); }
 const hr = $("#hours");
 hr.addEventListener("input", ()=>{ upd(); });
 
+const INV_STD=[1,2,3,5,6,8,10,12,15,20,25,30];
+function invStd(kw){ return INV_STD.find(v=>v>=kw-0.05) || Math.ceil(kw); }
 function calc(){
-  const H = +hr.value; let cont=0, ac=0, acOut=0, day=0, pCont=0, pAc=0, pDay=0, n=0, heavy=[];
-  E.forEach(e=>{ if(!e.id || !Q[e.id]) return; const q=Q[e.id]; n+=q;
-    if(e.c==="cont"){ cont += e.w*e.h*q/1000; pCont += e.w*q; }
-    else if(e.c==="ac"){ ac += e.w*acH*q/1000; acOut += e.w*Math.min(acH,H)*q/1000; pAc += e.w*q; }
-    else { day += e.w*e.h*q/1000; pDay = Math.max(pDay, e.w); if(e.w>=900) heavy.push(e.n.split(" /")[0].toLowerCase()); }
+  const H = +hr.value; let cont=0, ac=0, acOut=0, day=0, pCont=0, pAc=0, pDay=0, n=0, heavy=[], surge=0, surgeND=0, acTxt=[];
+  E.forEach(e=>{ if(!e.id || !Q[e.id]) return; const q=Q[e.id], h=HR[e.id]; n+=q;
+    const ex = (e.m||0)*e.w;  // pico extra al arrancar (motores/compresores)
+    if(e.c==="cont"){ cont += e.w*h*(e.d||1)*q/1000; pCont += e.w*q; surge=Math.max(surge,ex); surgeND=Math.max(surgeND,ex); }
+    else if(e.c==="ac"){ ac += e.w*h*q/1000; acOut += e.w*Math.min(h,H)*q/1000; pAc += e.w*q; surge=Math.max(surge,ex); surgeND=Math.max(surgeND,ex); acTxt.push(`${q} aire${q>1?"s":""} ${hfmt(h)}`); }
+    else { day += e.w*h*q/1000; pDay = Math.max(pDay, e.w); surge=Math.max(surge,ex); if(e.w>=900) heavy.push(e.n.split(" /")[0].toLowerCase()); }
   });
   const kwh = cont+ac+day;
-  const batt = (cont*H/24 + acOut)/0.9*1.1;
+  const dayOut = day*Math.max(0,H-12)/12;           // si el apagón es largo, parte de la cocina también sale de la batería
+  const batt = (cont*Math.min(H,24)/24 + acOut + dayOut)/0.9*1.1;
   const pan = Math.max(2, Math.ceil(kwh*1.15/(2.1*PW/550)));
   const peak = pCont + pAc + pDay;
-  const inv = peak*1.2/1000;
-  return {H,kwh,batt,pan,peak,inv,n,heavy,hasAc:pAc>0,day,pDay};
+  const inv = Math.max(peak*1.25, peak + surge)/1000;                       // potencia continua +25% o pico de arranque
+  const invNoDay = Math.max((peak-pDay)*1.25, (peak-pDay) + surgeND)/1000;
+  return {H,kwh,batt,pan,peak,inv,invNoDay,n,heavy,hasAc:pAc>0,day,pDay,acTxt};
 }
 function upd(){
   const H = +hr.value; $("#hv").innerHTML = H+"<small>h</small>";
   hr.style.setProperty("--p", ((H-2)/22*100)+"%");
   const r = calc();
-  $("#acx").classList.toggle("show", r.hasAc);
   $("#liveE").textContent = fmt(r.kwh)+" kWh";
   $("#liveN").textContent = r.n ? `al día · ${r.n} equipo${r.n>1?"s":""} marcado${r.n>1?"s":""}` : "al día · ningún equipo marcado";
   $("#go").disabled = !r.n;
   if($("#res").classList.contains("show")) render(r);
 }
 function renderEx(r){
-  const x=exVals(), prod=x.np*PW/550*2.1, need=r.kwh*1.15, batU=x.v*x.ah/1000*0.9, invNeed=r.peak*1.2/1000, invNoDay=(r.peak-r.pDay)*1.2/1000;
+  const x=exVals(), prod=x.np*PW/550*2.1, need=r.kwh*1.15, batU=x.v*x.ah/1000*0.9, invNeed=r.inv, invNoDay=r.invNoDay;
   const panMiss=Math.max(0,r.pan-x.np), batMiss=Math.max(0,r.batt-batU), t=[], fixes=[];
   if(panMiss){ fixes.push(`${panMiss} panel${panMiss>1?"es":""}`); t.push(["☀️",`Tus ${x.np} paneles producen unos ${fmt(prod)} kWh al día y tu casa gasta ${fmt(r.kwh)}. Agrega <b>${panMiss} panel${panMiss>1?"es":""} de ${PW} W</b> para cubrir el día y llenar la batería.`]); }
   else t.push(["✅",`Tus ${x.np} paneles producen unos ${fmt(prod)} kWh al día: cubren tu consumo de ${fmt(r.kwh)} kWh.`]);
@@ -303,19 +308,19 @@ function renderEx(r){
     t.push(["🔋",`Con ${r.H} h de apagón necesitas unos ${fmt(r.batt)} kWh y tu batería da unos ${fmt(batU)}. Te faltan <b>${fmt(batMiss)} kWh</b>${x.ah?` (≈ ${nb} batería${nb>1?"s":""} más igual a la tuya)`:""}.`]); }
   else t.push(["✅",`Tu batería (≈ ${fmt(batU)} kWh útiles) alcanza para ${r.H} h de apagón.`]);
   if(invNeed>x.inv){
-    if(invNoDay<=x.inv && r.heavy.length){ t.push(["🍳",`Tu inversor de ${fmt(x.inv)} kW alcanza, pero <b>no uses ${[...new Set(r.heavy)].join(", ")} a la vez</b>: úsalos de uno en uno y de día.`]); }
-    else { fixes.push(`inversor de ${Math.ceil(invNeed)} kW`); t.push(["⚡",`Tu inversor de ${fmt(x.inv)} kW se queda corto: lo que tienes encendido a la vez pide unos ${fmt(invNeed)} kW.`]); }
+    if(invNoDay<=x.inv && r.heavy.length){ { const hv=[...new Set(r.heavy)]; t.push(["🍳",`Tu inversor de ${fmt(x.inv)} kW alcanza, pero <b>${hv.length>1?`usa ${hv.join(", ")} de uno en uno`:`no prendas la ${hv[0]} junto con todo lo demás`}</b>: mejor de día y con pocos equipos encendidos.`]); } }
+    else { fixes.push(`inversor de ${invStd(invNeed)} kW`); t.push(["⚡",`Tu inversor de ${fmt(x.inv)} kW se queda corto: lo que tienes encendido a la vez, contando el arranque de los motores, pide unos ${fmt(invNeed)} kW.`]); }
   } else { t.push(["✅",`Tu inversor de ${fmt(x.inv)} kW aguanta tus equipos.`]); if(r.heavy.length>1) t.push(["🍳",`Usa ${[...new Set(r.heavy)].join(", ")} de uno en uno y de día, con el sol.`]); }
   const name = fixes.length ? "Tu sistema necesita un ajuste" : "Tu sistema alcanza";
   $("#kTag").textContent="Revisión de tu sistema"; $("#kName").textContent=name;
   $("#kDesc").textContent = fixes.length ? "Le falta: "+fixes.join(", ")+"." : "Con tu sistema actual cubres tu consumo y tu apagón.";
   $("#sPan").innerHTML=(panMiss?`+${panMiss}`:'<span class="ok">OK</span>'); $("#sPanK").textContent=panMiss?`paneles ${PW} W`:`tus ${x.np} paneles`;
-  $("#sInv").innerHTML=(invNeed>x.inv && !(invNoDay<=x.inv && r.heavy.length))?`${Math.ceil(invNeed)} kW`:'<span class="ok">OK</span>';
+  $("#sInv").innerHTML=(invNeed>x.inv && !(invNoDay<=x.inv && r.heavy.length))?`${invStd(invNeed)} kW`:'<span class="ok">OK</span>';
   $("#sBat").innerHTML=batMiss>0.3?`+${fmt(batMiss)} kWh`:'<span class="ok">OK</span>';
   $("#mE").textContent=fmt(r.kwh)+" kWh"; $("#mB").textContent=fmt(r.batt)+" kWh"; $("#mP").textContent=fmt(r.peak,0)+" W";
   setTimeout(()=>{ $("#fE").style.width=Math.min(100,r.kwh/Math.max(prod,0.1)*100)+"%"; $("#fB").style.width=Math.min(100,r.batt/Math.max(batU,0.1)*100)+"%"; $("#fP").style.width=Math.min(100,r.peak/1000/Math.max(x.inv,0.1)*100)+"%"; },60);
   $("#tips").innerHTML=t.map(y=>`<div class="tip"><i>${y[0]}</i><span>${y[1]}</span></div>`).join("");
-  const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n}`).join("\n");
+  const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n} · ${hfmt(HR[e.id])}${e.c==="ac"?" de noche":"/día"}`).join("\n");
   const msg=`Hola Sin Apagón, revisé mi sistema en la calculadora:\n\nTengo: inversor ${fmt(x.inv)} kW, ${x.np} paneles de ${PW} W, batería ${fmt(x.v,0)} V ${fmt(x.ah,0)} Ah\n\n${list}\n\nApagón: ${r.H} h\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name}${fixes.length?" (falta: "+fixes.join(", ")+")":""}\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
@@ -329,7 +334,7 @@ function render(r){
     name="Kit 10 kW"; pan=Math.ceil(6600/PW); inv=10; bat=15; extra=Math.max(0,r.pan-pan);
     desc="Para casas con aire acondicionado y muchos equipos. Aguanta la casa completa.";
   } else {
-    name="Sistema a medida"; tag="Tu casa necesita más"; pan=r.pan; inv=Math.ceil(r.inv); bat=Math.ceil(r.batt/5)*5;
+    name="Sistema a medida"; tag="Tu casa necesita más"; pan=r.pan; inv=Math.max(5,invStd(r.inv)); bat=Math.ceil(r.batt/5)*5;
     desc="Tu consumo es grande. Lo diseñamos a tu medida: escríbenos y lo revisamos juntos.";
   }
   if(extra) desc += ` Te recomendamos agregar ${extra} panel${extra>1?"es":""} extra.`;
@@ -339,12 +344,14 @@ function render(r){
   setTimeout(()=>{ $("#fE").style.width=Math.min(100,r.kwh/25*100)+"%"; $("#fB").style.width=Math.min(100,r.batt/(bat||1)*100)+"%"; $("#fP").style.width=Math.min(100,r.peak/1000/(inv||1)*100)+"%"; },60);
   const t=[];
   if(r.heavy.length) t.push(["☀️",`Usa ${[...new Set(r.heavy)].join(", ")} de día, con el sol. Así no gastas la batería.`]);
-  if(r.hasAc) t.push(["❄️",`El aire es lo que más consume: lo calculamos ${acH} h por noche.`]);
+  if(r.hasAc) t.push(["❄️",`El aire es lo que más consume: lo calculamos con ${r.acTxt.join(" y ")} por noche.`]);
+  if(r.batt<5 && bat>=10) t.push(["💡",`Tu consumo en el apagón es bajo (≈ ${fmt(r.batt)} kWh): con una batería más pequeña también te alcanzaría. Escríbenos y lo ajustamos.`]);
+  t.push(["⚡",`El inversor está calculado para aguantar tus equipos a la vez (${fmt(r.peak,0)} W) más el arranque de nevera, aire o bomba.`]);
   t.push(["🔋",`Con ${r.H} h de apagón necesitas unos ${fmt(r.batt)} kWh de batería de litio.`]);
   if(r.pan<=pan+extra) t.push(["✅",`Los paneles cubren tu consumo de ${fmt(r.kwh)} kWh al día y cargan la batería.`]);
   $("#tips").innerHTML=t.map(x=>`<div class="tip"><i>${x[0]}</i><span>${x[1]}</span></div>`).join("");
-  const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n}`).join("\n");
-  const msg=`Hola Sin Apagón, usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h${r.hasAc?`\nAire: ${acH} h por noche`:""}\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
+  const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n} · ${hfmt(HR[e.id])}${e.c==="ac"?" de noche":"/día"}`).join("\n");
+  const msg=`Hola Sin Apagón, usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 function track(path,title){ try{ if(window.goatcounter && goatcounter.count) goatcounter.count({path, title, event:true}); }catch(e){} }
