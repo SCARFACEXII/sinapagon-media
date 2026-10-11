@@ -178,7 +178,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     </div>
     <div class="card meters" style="margin-top:12px">
       <div class="meter"><div class="top"><span>Tu consumo diario</span><b id="mE">0 kWh</b></div><div class="track"><div class="fill" id="fE" style="background:var(--yel)"></div></div></div>
-      <div class="meter"><div class="top"><span>Batería que necesitas en el apagón</span><b id="mB">0 kWh</b></div><div class="track"><div class="fill" id="fB" style="background:var(--grn)"></div></div></div>
+      <div class="meter"><div class="top"><span>Batería para tu apagón (con reserva)</span><b id="mB">0 kWh</b></div><div class="track"><div class="fill" id="fB" style="background:var(--grn)"></div></div></div>
       <div class="meter"><div class="top"><span>Potencia máxima a la vez</span><b id="mP">0 W</b></div><div class="track"><div class="fill" id="fP" style="background:var(--cyan)"></div></div></div>
     </div>
     <div class="tips" id="tips"></div>
@@ -284,7 +284,8 @@ function calc(){
   const kwh = cont+ac+day;
   const dayOut = day*Math.max(0,H-12)/12;           // si el apagón es largo, parte de la cocina también sale de la batería
   const batt = (cont*Math.min(H,24)/24 + acOut + dayOut)/0.9*1.1;
-  const pan = Math.max(2, Math.ceil(kwh*1.15/(2.1*PW/550)));
+  const PFACT = 1.25; // pérdidas al cargar la batería, suciedad y días nublados
+  const pan = Math.max(2, Math.ceil(kwh*PFACT/(2.1*PW/550)));
   const peak = pCont + pAc + pDay;
   const inv = Math.max(peak*1.25, peak + surge)/1000;                       // potencia continua +25% o pico de arranque
   const invNoDay = Math.max((peak-pDay)*1.25, (peak-pDay) + surgeND)/1000;
@@ -312,7 +313,7 @@ function upd(){
   if($("#res").classList.contains("show")) render(r);
 }
 function renderEx(r){
-  const x=exVals(), prod=x.np*PW/550*2.1, need=r.kwh*1.15, batU=x.v*x.ah/1000*0.9, invNeed=r.inv, invNoDay=r.invNoDay;
+  const x=exVals(), prod=x.np*PW/550*2.1, need=r.kwh*1.25, batU=x.v*x.ah/1000*0.9, invNeed=r.inv, invNoDay=r.invNoDay;
   const panMiss=Math.max(0,r.pan-x.np), batMiss=Math.max(0,r.batt-batU), t=[], fixes=[];
   if(panMiss){ fixes.push(`${panMiss} panel${panMiss>1?"es":""}`); t.push(["☀️",`Tus ${x.np} paneles producen unos ${fmt(prod)} kWh al día y tu casa gasta ${fmt(r.kwh)}. Agrega <b>${panMiss} panel${panMiss>1?"es":""} de ${PW} W</b> para cubrir el día y llenar la batería.`]); }
   else t.push(["✅",`Tus ${x.np} paneles producen unos ${fmt(prod)} kWh al día: cubren tu consumo de ${fmt(r.kwh)} kWh.`]);
@@ -336,19 +337,19 @@ function renderEx(r){
   const msg=`Hola Sin Apagón, revisé mi sistema en la calculadora:\n\nTengo: inversor ${fmt(x.inv)} kW, ${x.np} paneles de ${PW} W, batería ${fmt(x.v,0)} V ${fmt(x.ah,0)} Ah\n\n${list}\n\nApagón: ${r.H} h\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name}${fixes.length?" (falta: "+fixes.join(", ")+")":""}\n\nTengo una duda:`;
   $("#wa").href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
+function pick(r){
+  const k5p=Math.ceil(2200/PW), k10p=Math.ceil(6600/PW);
+  if(r.invSys<=5 && r.batt<=10.5 && r.pan<=Math.ceil(3300/PW))
+    return {name:"Kit 5 kW", tag:"Recomendado para ti", desc:"El kit más pedido. Mueve tu casa durante el apagón sin preocuparte.", pan:k5p, inv:5, bat:10, extra:Math.max(0,r.pan-k5p)};
+  if(r.invSys<=10 && r.batt<=15.5 && r.pan<=Math.ceil(7700/PW))
+    return {name:"Kit 10 kW", tag:"Recomendado para ti", desc:"Para casas con aire acondicionado y muchos equipos. Aguanta la casa completa.", pan:k10p, inv:10, bat:15, extra:Math.max(0,r.pan-k10p)};
+  // a medida: nunca por debajo del kit de 10 kW
+  return {name:"Sistema a medida", tag:"Tu casa necesita más", desc:"Tu consumo es grande. Lo diseñamos a tu medida: escríbenos y lo revisamos juntos.",
+          pan:Math.max(r.pan,k10p), inv:Math.max(10,r.invSys), bat:Math.max(15,Math.ceil(r.batt/5)*5), extra:0};
+}
 function render(r){
   if(EX) return renderEx(r);
-  let name, tag="Recomendado para ti", desc, pan, inv, bat, extra=0;
-  if(r.invSys<=5 && r.batt<=10.5 && r.pan<=Math.ceil(3300/PW)){
-    name="Kit 5 kW"; pan=Math.ceil(2200/PW); inv=5; bat=10; extra=Math.max(0,r.pan-pan);
-    desc="El kit más pedido. Mueve tu casa durante el apagón sin preocuparte.";
-  } else if(r.invSys<=10 && r.batt<=15.5 && r.pan<=Math.ceil(7700/PW)){
-    name="Kit 10 kW"; pan=Math.ceil(6600/PW); inv=10; bat=15; extra=Math.max(0,r.pan-pan);
-    desc="Para casas con aire acondicionado y muchos equipos. Aguanta la casa completa.";
-  } else {
-    name="Sistema a medida"; tag="Tu casa necesita más"; pan=r.pan; inv=r.invSys; bat=Math.ceil(r.batt/5)*5;
-    desc="Tu consumo es grande. Lo diseñamos a tu medida: escríbenos y lo revisamos juntos.";
-  }
+  let {name, tag, desc, pan, inv, bat, extra} = pick(r);
   if(extra) desc += ` Te recomendamos agregar ${extra} panel${extra>1?"es":""} extra.`;
   $("#kTag").textContent=tag; $("#kName").textContent=name; $("#kDesc").textContent=desc;
   $("#sPan").textContent=pan+extra; $("#sPanK").textContent=`paneles ${PW} W`; $("#sInv").textContent=inv+" kW"; $("#sBat").textContent=bat+" kWh";
@@ -360,8 +361,10 @@ function render(r){
   if(r.batt<5 && bat>=10) t.push(["💡",`Tu consumo en el apagón es bajo (≈ ${fmt(r.batt)} kWh): con una batería más pequeña también te alcanzaría. Escríbenos y lo ajustamos.`]);
   t.push(["⚡",`Inversor de ${inv} kW: aguanta tus equipos a la vez (${fmt(r.peak,0)} W) más el arranque de nevera, aire o bomba, ${pan+extra>4?`recibe tus ${pan+extra} paneles`:"recibe tus paneles"} y recarga la batería con el sol.`]);
   if(inv>=10) t.push(["🔌",`Es de fase dividida: ${inv/2} kW por cada línea de 110 V. Reparte los aires y los equipos grandes entre las dos líneas.`]);
-  t.push(["🔋",`Con ${r.H} h de apagón necesitas unos ${fmt(r.batt)} kWh de batería de litio.`]);
-  if(r.pan<=pan+extra) t.push(["✅",`Los paneles cubren tu consumo de ${fmt(r.kwh)} kWh al día y cargan la batería.`]);
+  t.push(["🔋",`Con ${r.H} h de apagón necesitas unos ${fmt(r.batt)} kWh de batería de litio (incluye un 10% de reserva y lo que la batería no debe descargar).`]);
+  const prodK = (pan+extra)*2.1*PW/550;
+  t.push(["✅",`${pan+extra} paneles de ${PW} W producen unos ${fmt(prodK)} kWh al día: cubren tu consumo de ${fmt(r.kwh)} kWh y cargan la batería.`]);
+  if(pan+extra >= r.pan+3) t.push(["☀️",`El kit trae más paneles de los que necesitas (con ${r.pan} te alcanzaría): te sobra energía de día para usar equipos grandes con el sol.`]);
   $("#tips").innerHTML=t.map(x=>`<div class="tip"><i>${x[0]}</i><span>${x[1]}</span></div>`).join("");
   const list=E.filter(e=>e.id&&Q[e.id]).map(e=>`• ${Q[e.id]} ${e.n} · ${hfmt(HR[e.id])}${e.c==="ac"?" de noche":"/día"}`).join("\n");
   const msg=`Hola Sin Apagón, usé la calculadora:\n\n${list}\n\nApagón: ${r.H} h\nConsumo: ${fmt(r.kwh)} kWh/día\n\nResultado: ${name} (${pan+extra} paneles de ${PW} W, inversor ${inv} kW, batería ${bat} kWh)\n\nTengo una duda:`;
