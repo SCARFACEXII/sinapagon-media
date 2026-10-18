@@ -43,18 +43,20 @@ Inversor de 3 kW + 6 paneles + 2 baterías de gel de 12 V. Te explico por qué e
 Primer comentario: Antes de comprar, calcula lo que de verdad necesita tu casa 👉 https://scarfacexii.github.io/sinapagon-media/
 Título YouTube: Este sistema solar de internet NO funciona (te explico por qué) ⚠️ #shorts
 
-## Jueves 23 — Nevera vieja vs inverter
-Video: https://static.metricool.com/planner/202610/7112287-file-8434133670939176049.mp4
+## Jueves 23 — Inversor de baja vs alta frecuencia (1:30 min)
+Video: https://static.metricool.com/planner/202610/7112287-file-6051588444664452619.mp4
 Texto:
-🥊 Nevera vieja vs nevera inverter: ¿cuál se come tu batería?
+Inversor de BAJA frecuencia vs ALTA frecuencia 🥊 ¿Cuál te conviene?
 
-Round 1: consumo. Round 2: arranque. Round 3: precio. Gana la inverter 2 a 1… y te ahorra casi la mitad de batería si vas a poner paneles.
+Round 1: arranques. Round 2: consumo. Round 3: todo en uno. Round 4: reparación.
 
-¿La tuya es vieja o inverter? Dímelo 👇
+El resultado te va a sorprender… y te dice cuál va mejor para tu casa. Mira hasta el final 👀
 
-#panelessolares #energiasolar #nevera #inverter #apagon #sinapagon
-Primer comentario: Pon tu nevera y tus otros equipos aquí y mira cuánta batería necesitas 👉 https://scarfacexii.github.io/sinapagon-media/
-Título YouTube: Nevera vieja vs inverter: ¿cuál se come tu batería? 🥊 #shorts
+¿Cuál tienes tú, baja o alta? Dímelo 👇
+
+#inversor #panelessolares #energiasolar #apagon #sinapagon
+Primer comentario: ¿Qué inversor necesita tu casa? Pon tus equipos aquí y te lo dice 👉 https://scarfacexii.github.io/sinapagon-media/
+Título YouTube: Inversor de baja frecuencia vs alta frecuencia: ¿cuál te conviene? ⚡
 
 ## Viernes 24 — ¿Kit de 5 o de 10 kW?
 Video: https://static.metricool.com/planner/202610/7112287-file-11122659635988170915.mp4
